@@ -11,17 +11,18 @@
 ##the get inverserse returns the inverse if calculated. else it returns the 
 ##pre-set value NULL
 makeCacheMatrix <- function(x = matrix()) {
-    im <- NULL
+    im <- NULL #setting the cache to NULL
     set <- function(y) {
-      x <<- y
-      im <<- NULL
+      x <<- y #safing the input matrix
+      im <<- NULL 
     }
-    get <- function() x
-    setinverse <- function(inverse) im <<- inverse
-    getinverse <- function() im
-    list(set = set, get = get,
-         setinverse = setinverse,
-         getinverse = getinverse)
+    get <- function() x #function returns the input data
+    setinverse <- function(inverse) im <<- inverse #safe the result to the cache
+    getinverse <- function() im #returns the content of the cache, will be NULL 
+                                #if nothing has been safed
+    list(set = set, get = get,  #return a list of functions
+         setinverse = setinverse, #functions will be executed once the function
+         getinverse = getinverse) #is called by cacheSolve
 }
 
 
@@ -32,16 +33,22 @@ makeCacheMatrix <- function(x = matrix()) {
 ##TO do so data is retreived using get and this data is passed to the solve func
 ##results from the solve function are safed using setinverse
 cacheSolve <- function(x, ...) {
-    im <- x$getinverse()
-    if(!is.null(im)) {
-      message("getting cached data")
-      return(im)
-    }
-    data <- x$get()
-    im <- solve(data, ...)
-    x$setinverse(im)
-    im
+    im <- x$getinverse() #this function call requests the cache content
+    if(!is.null(im)) {   #if the function has been called previously
+      message("getting cached data") # the cache will contain the answer previously
+      return(im)                      #calculated
+    } #otherwise the function continues to
+    data <- x$get() #request the data passed to makeCacheMatrix
+    im <- solve(data, ...) #the data is passed to solve()-which calculates inverse
+    x$setinverse(im) #the answer is safed to the cache using the setinverse() func
+    im #then the answer is returned. 
 }
+
+##the matrix should be passed to the makeCacheMatrix function
+##once the cacheSolve function is called with the output of makeCacheMatrix
+##the inverse will be calculated and safed. Every next call will return the 
+##cache content with a message: getting cached data
+
 
 ##the use of the <<- operator is because the makeCacheMatrix is defined outside 
 ##of the cacheSolve function. otherwise the assignment of the im and x variables 
